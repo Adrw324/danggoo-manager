@@ -1,0 +1,131 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+<div class="container">
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Start</th>
+                    <th scope="col">End</th>
+                    <th scope="col">Playtime</th>
+                    <th scope="col">Fee</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="row1">
+                    <th class="align-middle" scope="row">1</th>
+                    <td class="align-middle"><input type="datetime-local" id="start1" name="start"></td>
+                    <td class="align-middle"><input type="datetime-local" id="end1" name="end"></td>
+                    <td class="align-middle"><input type="text" id="playtime1" name="playtime"></td>
+                    <td class="align-middle"><input type="text" id="fee1" name="fee"></td>
+                    <td class="align-middle"><button type="button" class="btn btn-primary" onclick="finishRow(this, 1)">Finish</button></td>
+                    <td class="align-middle"><button type="button" class="btn btn-danger"  onclick="resetRow(this, 1)">Reset</button></td>
+                </tr>
+               
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+
+    function finishRow(button, num) {
+        // Perform any necessary operations before sending data to the controller
+        
+        var confirmation = confirm("Are you sure you want to finish this record?");
+
+        if (confirmation) {
+            // Perform the finish operation
+            var row = button.parentNode.parentNode;
+
+            const date = new Date();
+            const utcOffsetMinutes = date.getTimezoneOffset();
+            
+            var startInput = document.getElementById('start' + num);
+            var endInput = document.getElementById('end' + num);
+            var playtimeInput = document.getElementById('playtime' + num);
+            var feeInput = document.getElementById('fee' + num);
+
+            var start = new Date(startInput.value);
+            var end = new Date(endInput.value);
+            var playtime = parseInt(playtimeInput.value);
+            var fee = parseFloat(feeInput.value);
+
+            @* var playtimeMilliseconds = end - start;
+            var playtime = new Date(playtimeMilliseconds);  
+        
+            var feeRate = 10; // Example fee rate per hour
+            var playtimeMinutes = playtimeMilliseconds / (1000 * 60);
+            var fee = playtimeMinutes * feeRate / 60;
+
+            
+            feeInput.value = fee.toFixed(2); // Assuming fee is in decimal format
+        *@
+
+            var dataToSend = {
+                Table_Num: num,
+                Date: date.toISOString(),
+                Start: start.toISOString(),
+                End: end.toISOString(),
+                Playtime: playtime,
+                Fee: fee,
+            };
+            
+            console.log(dataToSend);
+
+            fetch('/Records/SaveRecord', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+                body: JSON.stringify(
+                    {
+                        record: dataToSend,
+                        utcOffsetMinutes: utcOffsetMinutes
+                    })
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.success) {
+                    alert(result.message);
+                } else {
+                    alert('Failed to save record.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+            startInput.value = "";
+            endInput.value = "";
+            playtimeInput.value = "";
+            feeInput.value = "";
+        }
+        
+        
+    }
+
+    function resetRow(button, num) {
+        // Perform any necessary operations before sending data to the controller
+        var row = button.parentNode.parentNode;
+        
+        var startInput = document.getElementById('start' + num);
+        var endInput = document.getElementById('end' + num);
+        var playtimeInput = document.getElementById('playtime' + num);
+        var feeInput = document.getElementById('fee' + num);
+
+        startInput.value = "";
+        endInput.value = "";
+        playtimeInput.value = "";
+        feeInput.value = "";
+    }
+</script>

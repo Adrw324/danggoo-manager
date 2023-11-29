@@ -1,0 +1,134 @@
+@model IEnumerable<danggoo_manager.Models.Record>
+
+@{
+    ViewData["Title"] = "Records";
+}
+
+<h1>Records</h1>
+
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+@using (Html.BeginForm("Index", "Records", FormMethod.Get))
+{
+    <div class="form-row row">
+        <div class="col-2">
+            <label for="tableNumber">Table Number:</label>
+            <select name="tableNumber" class="form-control">
+                <option value="">All</option>
+                @foreach (var item in Model.Select(r => r.Table_Num).Distinct())
+                {
+                    <option value="@item">@item</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-2">
+            <label for="year">Year:</label>
+            <select name="year" class="form-control">
+                <option value="">All</option>
+                @foreach (var year in Model.Select(r => r.Date.Year).Distinct())
+                {
+                    <option value="@year">@year</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-2">
+            <label for="month">Month:</label>
+            <select name="month" class="form-control">
+                <option value="">All</option>
+                @for (int i = 1; i <= 12; i++)
+                {
+                    <option value="@i">@i</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-2">
+            <label for="day">Day:</label>
+            <input type="date" name="day" class="form-control" />
+        </div>
+        
+        <div class="col-2">       
+            <br>
+            <input type="submit" value="Apply Filters" class="btn btn-primary" />
+        </div>
+        
+    </div>
+
+
+    
+}
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Table
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Start)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.End)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Playtime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Fee)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Table_Num)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Start)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.End)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Playtime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Fee)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><b>Total</b></td>
+            <td>
+                @{
+                    decimal totalFee = Model.Sum(item => item.Fee);
+                }
+                @totalFee
+            </td>
+        </tr>
+    </tbody>
+</table>
